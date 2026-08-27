@@ -22,22 +22,43 @@ class ArrayList(Sequence[T]):
         self._A = self._make_array(self._capacity)
 
     def __getitem__(self, index: int) -> T:
-        raise NotImplementedError
+        if index < 0 or index >= self._n:
+            raise IndexError("list index out of range")
+        return self._A[index]
 
     def __setitem__(self, index: int, value: T) -> None:
-        raise NotImplementedError
+        if index < 0 or index >= self._n:
+            raise IndexError("list assignment index out of range")
+        self._A[index] = value
 
     def __delitem__(self, index: int) -> None:
-        raise NotImplementedError
+        if index < 0 or index >= self._n:
+            raise IndexError("list assignment index out of range")
+        for position in range(index, self._n - 1):
+            self._A[position] = self._A[position + 1]
+        self._A[self._n - 1] = None
+        self._n -= 1
 
     def insert(self, index: int, value: T) -> None:
-        raise NotImplementedError
+        if index < 0 or index > self._n:
+            raise IndexError("list insertion index out of range")
+        if self._n == self._capacity:
+            self._capacity *= 2
+            new_array = self._make_array(self._capacity)
+            for position in range(self._n):
+                new_array[position] = self._A[position]
+            self._A = new_array
+        for position in range(self._n, index, -1):
+            self._A[position] = self._A[position - 1]
+        self._A[index] = value
+        self._n += 1
 
     def __len__(self) -> int:
-        raise NotImplementedError
+        return self._n
 
     def __iter__(self) -> Iterator[T]:
-        raise NotImplementedError
+        for index in range(self._n):
+            yield self._A[index]
 
     def _make_array(self,c):
         return (c * ctypes.py_object) ()
