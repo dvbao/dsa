@@ -23,16 +23,25 @@ class LinkedStack(Stack[T]):
 
     def __init__(self):
         """Create an empty stack."""
-        raise NotImplementedError
+        self._head = None
+        self._n = 0
 
     def push(self, item: T) -> None:
-        raise NotImplementedError
+        self._head = self._Node(item, self._head)
+        self._n += 1
 
     def pop(self) -> T:
-        raise NotImplementedError
+        if self._head is None:
+            raise IndexError("pop from empty stack")
+        item = self._head._element
+        self._head = self._head._next
+        self._n -= 1
+        return item
 
     def top(self) -> T:
-        raise NotImplementedError
+        if self._head is None:
+            raise IndexError("top from empty stack")
+        return self._head._element
 
     def __len__(self) -> int:
-        raise NotImplementedError
+        return self._n

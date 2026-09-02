@@ -26,26 +26,71 @@ class LinkedList(Sequence[T]):
 
     def __init__(self):
         """Create an empty linked list."""
-        raise NotImplementedError
+        self._head = None
+        self._tail = None
+        self._n = 0
 
     def append(self, value: T) -> None:
-
-        raise NotImplementedError
+        new_node = self._Node(value, self._tail, None)
+        if self._tail is None:
+            self._head = new_node
+        else:
+            self._tail._next = new_node
+        self._tail = new_node
+        self._n += 1
 
     def __getitem__(self, index: int) -> T:
-        raise NotImplementedError
+        return self._node_at(index)._element
 
     def __setitem__(self, index: int, value: T) -> None:
-        raise NotImplementedError
+        self._node_at(index)._element = value
 
     def __delitem__(self, index: int) -> None:
-        raise NotImplementedError
+        node = self._node_at(index)
+        if node._prev is None:
+            self._head = node._next
+        else:
+            node._prev._next = node._next
+        if node._next is None:
+            self._tail = node._prev
+        else:
+            node._next._prev = node._prev
+        self._n -= 1
 
     def insert(self, index: int, value: T) -> None:
-        raise NotImplementedError
+        if index < 0 or index > self._n:
+            raise IndexError('index out of range')
+        if index == self._n:
+            self.append(value)
+            return
+
+        next_node = self._node_at(index)
+        new_node = self._Node(value, next_node._prev, next_node)
+        if next_node._prev is None:
+            self._head = new_node
+        else:
+            next_node._prev._next = new_node
+        next_node._prev = new_node
+        self._n += 1
 
     def __len__(self) -> int:
-        raise NotImplementedError
+        return self._n
 
     def __iter__(self) -> Iterator[T]:
-        raise NotImplementedError
+        current = self._head
+        while current is not None:
+            yield current._element
+            current = current._next
+
+    def _node_at(self, index: int) -> _Node:
+        if index < 0 or index >= self._n:
+            raise IndexError('index out of range')
+        if index < self._n // 2:
+            current = self._head
+            for _ in range(index):
+                current = current._next
+        else:
+            current = self._tail
+            for _ in range(self._n - 1, index, -1):
+                current = current._prev
+        return current

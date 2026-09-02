@@ -23,16 +23,33 @@ class LinkedQueue(Queue[T]):
 
     def __init__(self):
         """Create an empty queue."""
-        raise NotImplementedError
+        self._head = None
+        self._tail = None
+        self._n = 0
 
     def enqueue(self, item: T) -> None:
-        raise NotImplementedError
+        new_node = self._Node(item)
+        if self._tail is None:
+            self._head = new_node
+        else:
+            self._tail._next = new_node
+        self._tail = new_node
+        self._n += 1
 
     def dequeue(self) -> T:
-        raise NotImplementedError
+        if self._head is None:
+            raise IndexError("dequeue from empty queue")
+        item = self._head._element
+        self._head = self._head._next
+        self._n -= 1
+        if self._head is None:
+            self._tail = None
+        return item
 
     def front(self) -> T:
-        raise NotImplementedError
+        if self._head is None:
+            raise IndexError("front from empty queue")
+        return self._head._element
 
     def __len__(self) -> int:
-        raise NotImplementedError
+        return self._n
