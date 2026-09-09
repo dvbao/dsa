@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Excel files
+*.xlsx
+
+# Jupyter notebooks
+*.ipynb
+
+# Ignore all Markdown files
+*.md
+
+# Except root README.md
+!/README.md
+
+# Ignore CSV files
+*.csv
