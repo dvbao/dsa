@@ -1,6 +1,7 @@
 """Abstract base classes defining tree interfaces."""
 
 from abc import ABC, abstractmethod
+from collections import deque
 from typing import TypeVar, Generic, Iterator, Optional
 
 T = TypeVar('T')
@@ -160,7 +161,11 @@ class Tree(ABC, Generic[T]):
         Returns:
             The height of the subtree rooted at p.
         """
-        raise NotImplementedError
+        if p is None:
+            p = self.root()
+            if p is None:
+                return -1
+        return 1 + max((self.height(c) for c in self.children(p)), default=-1)
 
 
     def __iter__(self) -> Iterator[T]:
@@ -184,7 +189,14 @@ class Tree(ABC, Generic[T]):
 
     def postorder(self) -> Iterator[Position]:
         """Generate a postorder iteration of positions in the tree."""
-        raise NotImplementedError
+        if not self.is_empty():
+            yield from self._subtree_postorder(self.root())
+
+    def _subtree_postorder(self, p: Position) -> Iterator[Position]:
+        """Generate positions in the subtree rooted at p in postorder."""
+        for c in self.children(p):
+            yield from self._subtree_postorder(c)
+        yield p
 
     def levelorder(self) -> Iterator[Position]:
         """Generate a breadth-first (level-order) iteration of positions.
@@ -192,7 +204,12 @@ class Tree(ABC, Generic[T]):
         Visits all nodes at depth 0 (root), then depth 1, then depth 2, etc.
         Uses a queue to track nodes to visit.
         """
-        raise NotImplementedError
+        if not self.is_empty():
+            pending = deque([self.root()])
+            while pending:
+                p = pending.popleft()
+                yield p
+                pending.extend(self.children(p))
 
 
 
@@ -286,6 +303,16 @@ class BinaryTree(Tree[T]):
 
     def inorder(self) -> Iterator[Tree.Position]:
         """Generate an inorder iteration of positions in the tree."""
-        raise NotImplementedError
+        if not self.is_empty():
+            yield from self._subtree_inorder(self.root())
 
+    def _subtree_inorder(self, p: Tree.Position) -> Iterator[Tree.Position]:
+        """Generate positions in the subtree rooted at p in inorder."""
+        left = self.left(p)
+        if left is not None:
+            yield from self._subtree_inorder(left)
+        yield p
+        right = self.right(p)
+        if right is not None:
+            yield from self._subtree_inorder(right)
 
