@@ -8,7 +8,7 @@ class TestBisectLeft:
         assert bisect_left([], 5) == 0
 
     def test_insert_at_beginning(self):
-        assert bisect_left([2, 4, 6], 1) == None
+        assert bisect_left([2, 4, 6], 1) == 0
 
     def test_insert_at_end(self):
         assert bisect_left([2, 4, 6], 7) == 3
