@@ -1,7 +1,7 @@
 """Hash table implementation of a map."""
 
 from dsa.maps.base import Map
-from typing import TypeVar, Iterator, Optional, List
+from typing import TypeVar, Iterator, List, Tuple
 
 K = TypeVar('K')
 V = TypeVar('V')
@@ -27,30 +27,71 @@ class HashMap(Map[K, V]):
         Args:
             capacity: Initial number of buckets. Defaults to 11.
         """
-        raise NotImplementedError
+        if not isinstance(capacity, int):
+            raise TypeError('capacity must be an integer')
+        if capacity <= 0:
+            raise ValueError('capacity must be positive')
+
+        self._table: List[List[Tuple[K, V]]] = [
+            [] for _ in range(capacity)
+        ]
+        self._size = 0
 
     def __len__(self) -> int:
-        raise NotImplementedError
+        return self._size
 
     def __getitem__(self, key: K) -> V:
-        raise NotImplementedError
+        bucket = self._table[self._hash(key)]
+        for stored_key, stored_value in bucket:
+            if stored_key == key:
+                return stored_value
+        raise KeyError(key)
 
     def __setitem__(self, key: K, value: V) -> None:
-        raise NotImplementedError
+        bucket = self._table[self._hash(key)]
+
+        for index, (stored_key, _) in enumerate(bucket):
+            if stored_key == key:
+                bucket[index] = (key, value)
+                return
+
+        bucket.append((key, value))
+        self._size += 1
+
+        if self._size / len(self._table) > self.LOAD_FACTOR_THRESHOLD:
+            self._resize(2 * len(self._table) + 1)
 
     def __delitem__(self, key: K) -> None:
-        raise NotImplementedError
+        bucket = self._table[self._hash(key)]
+        for index, (stored_key, _) in enumerate(bucket):
+            if stored_key == key:
+                bucket.pop(index)
+                self._size -= 1
+                return
+        raise KeyError(key)
 
     def __contains__(self, key: K) -> bool:
-        raise NotImplementedError
+        bucket = self._table[self._hash(key)]
+        return any(stored_key == key for stored_key, _ in bucket)
 
     def __iter__(self) -> Iterator[K]:
-        raise NotImplementedError
+        for bucket in self._table:
+            for key, _ in bucket:
+                yield key
 
     def _hash(self, key: K) -> int:
         """Compute the bucket index for the given key."""
-        raise NotImplementedError
+        return hash(key) % len(self._table)
 
     def _resize(self, new_capacity: int) -> None:
         """Resize the hash table to the given capacity."""
-        raise NotImplementedError
+        if new_capacity <= 0:
+            raise ValueError('new capacity must be positive')
+
+        old_table = self._table
+        self._table = [[] for _ in range(new_capacity)]
+
+        for bucket in old_table:
+            for key, value in bucket:
+                new_bucket = self._table[self._hash(key)]
+                new_bucket.append((key, value))
