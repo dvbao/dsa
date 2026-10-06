@@ -5,9 +5,6 @@ __pycache__/
 # Excel files
 *.xlsx
 
-# Jupyter notebooks
-*.ipynb
-
 # Ignore all Markdown files
 *.md
 
